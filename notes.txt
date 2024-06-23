@@ -1,11 +1,18 @@
 tutorial source :
 https://dylancastillo.co/elasticsearch-python/#what%E2%80%99s-elasticsearch
 
-
+!!! had to downgrade numpy to  numpy==1.26.4 !!!
 
 Create a Local Elasticsearch Cluster
-docker run --rm -p 9200:9200 -p 9300:9300 -e "xpack.security.enabled=false" -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:8.7.0
+docker run --rm -p 9200:9200 -p 9300:9300 -e "xpack.security.enabled=false" -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:8.14.1
+or
+------------ docker run --name es01 --net elastic -p 9200:9200 -it -m 1GB docker.elastic.co/elasticsearch/elasticsearch:8.14.1
 
+reset via
+docker exec -it es01 /usr/share/elasticsearch/bin/elasticsearch-reset-password -u elastic
+docker exec -it es01 /usr/share/elasticsearch/bin/elasticsearch-create-enrollment-token -s kibana
+
+docker cp es01:/usr/share/elasticsearch/config/certs/http_ca.crt .
 
 in notebook : 
 
@@ -18,6 +25,9 @@ es.info().body
 ------------
 dataset :
 https://www.kaggle.com/datasets/jrobischon/wikipedia-movie-plots?ref=dylancastillo.co
+
+name :
+dataset_wiki_movies.csv
 ------------
 
 in notebook : 
@@ -50,3 +60,26 @@ mappings = {
 
 es.indices.create(index="movies", mappings=mappings)
 
+
+
+----- TOKEN -----
+✅ Elasticsearch security features have been automatically configured!
+✅ Authentication is enabled and cluster connections are encrypted.
+
+ℹ️  Password for the elastic user (reset with `bin/elasticsearch-reset-password -u elastic`):
+  =ypsEcmzaxviWq46guZE
+
+ℹ️  HTTP CA certificate SHA-256 fingerprint:
+  7f87fda31e8302c1d5b46922ebf877facb64c1f33fbc0fb6a197a48cb62422ef
+
+ℹ️  Configure Kibana to use this cluster:
+• Run Kibana and click the configuration link in the terminal when Kibana starts.
+• Copy the following enrollment token and paste it into Kibana in your browser (valid for the next 30 minutes):
+  eyJ2ZXIiOiI4LjE0LjAiLCJhZHIiOlsiMTcyLjE3LjAuMjo5MjAwIl0sImZnciI6IjdmODdmZGEzMWU4MzAyYzFkNWI0NjkyMmViZjg3N2ZhY2I2NGMxZjMzZmJjMGZiNmExOTdhNDhjYjYyNDIyZWYiLCJrZXkiOiJmelpqUlpBQklKdktKcXdwVVpCUToyUnNMVGJuNVFFMmE3RmU4STF2aUZBIn0=
+
+ℹ️ Configure other nodes to join this cluster:
+• Copy the following enrollment token and start new Elasticsearch nodes with `bin/elasticsearch --enrollment-token <token>` (valid for the next 30 minutes):
+  eyJ2ZXIiOiI4LjE0LjAiLCJhZHIiOlsiMTcyLjE3LjAuMjo5MjAwIl0sImZnciI6IjdmODdmZGEzMWU4MzAyYzFkNWI0NjkyMmViZjg3N2ZhY2I2NGMxZjMzZmJjMGZiNmExOTdhNDhjYjYyNDIyZWYiLCJrZXkiOiJnVFpqUlpBQklKdktKcXdwVVpCZTpGdDl5RG5WUlRmbWVtQ2FJdjg1SDd3In0=
+
+  If you're running in Docker, copy the enrollment token and run:
+  `docker run -e "ENROLLMENT_TOKEN=<token>" docker.elastic.co/elasticsearch/elasticsearch:8.14.1`
