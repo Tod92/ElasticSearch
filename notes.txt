@@ -1,6 +1,8 @@
 tutorial source :
 https://dylancastillo.co/elasticsearch-python/#what%E2%80%99s-elasticsearch
 
+
+
 Create a Local Elasticsearch Cluster
 docker run --rm -p 9200:9200 -p 9300:9300 -e "xpack.security.enabled=false" -e "discovery.type=single-node" docker.elastic.co/elasticsearch/elasticsearch:8.7.0
 
@@ -11,3 +13,40 @@ from elasticsearch import Elasticsearch
 
 es = Elasticsearch("http://localhost:9200")
 es.info().body
+
+
+------------
+dataset :
+https://www.kaggle.com/datasets/jrobischon/wikipedia-movie-plots?ref=dylancastillo.co
+------------
+
+in notebook : 
+
+import pandas as pd
+
+df = (
+    pd.read_csv("wiki_movie_plots_deduped.csv")
+    .dropna()
+    .sample(5000, random_state=42)
+    .reset_index()
+)
+
+
+
+CREATE INDEX
+
+mappings = {
+        "properties": {
+            "title": {"type": "text", "analyzer": "english"},
+            "ethnicity": {"type": "text", "analyzer": "standard"},
+            "director": {"type": "text", "analyzer": "standard"},
+            "cast": {"type": "text", "analyzer": "standard"},
+            "genre": {"type": "text", "analyzer": "standard"},
+            "plot": {"type": "text", "analyzer": "english"},
+            "year": {"type": "integer"},
+            "wiki_page": {"type": "keyword"}
+    }
+}
+
+es.indices.create(index="movies", mappings=mappings)
+
